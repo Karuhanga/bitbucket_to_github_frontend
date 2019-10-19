@@ -43,9 +43,12 @@
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
-                    <span class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
-                        <strong>{{userInfo.display_name}}</strong>
-                    </span>
+                        <a v-if="!loginInfo.githubAuthenticated" :disabled="githubLoading" target="_blank" :href="`https://github.com/login/oauth/authorize?client_id=Iv1.7e7b7b4572147e74`" class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
+                            <strong>Authorize Github</strong>
+                        </a>
+                        <span class="button is-primary navbar-item no-cursor">
+                            <strong>{{userInfo.display_name}}</strong>
+                        </span>
                         <a @click="logout()" class="button is-light waves-effect waves-light btn">
                             Log out
                         </a>

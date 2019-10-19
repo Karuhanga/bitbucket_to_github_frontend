@@ -1,9 +1,8 @@
 const DEBUG = true;
 let app;
 
-const instance = axios.create({
-    baseURL: 'localhost:5000/api/actions',
-    timeout: 1000,
+const bitbucketToGithub = axios.create({
+    baseURL: 'http://127.0.0.1:8000/api',
 });
 
 const bitbucket = axios.create({
@@ -24,7 +23,7 @@ function clearHash() {
     }
 }
 
-function retrieveToken() {
+function retrieveBitbucketToken() {
     // #access_token={token}&token_type=bearer
     if (window.location.hash){
         // todo some validation here and possibly remove token from url
@@ -37,14 +36,26 @@ function retrieveToken() {
     }
 }
 
-function init(token) {
+function retrieveGithubCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    if (code) {
+        urlParams.delete('code');
+        return code;
+    }
+}
+
+async function init(token, code) {
     app = new Vue({
         el: '#app',
         data: {
             token: token,
+            code: code,
             userInfo: {},
+            loginInfo: {},
             loading: false,
             repos: {},
+            githubLoading: false,
         },
         computed: {
             loggedIn: function () {
@@ -60,12 +71,31 @@ function init(token) {
                 try {
                     const response = await bitbucket.get(`/user?access_token=${this.token}`);
                     this.userInfo = response.data;
+
+                    const result = await bitbucketToGithub.post('/login/', {
+                        "username": this.userInfo.username,
+                        "bitbucket_token": this.token,
+                    });
+                    this.loginInfo = result.data;
                 } catch (e) {
                     this.logout();
                 } finally {
                     this.loading = false;
                 }
 
+            },
+            retrieveGithubAuthToken: async function() {
+                if (!this.loginInfo.githubAuthenticated) {
+                    this.githubLoading = true;
+                    try {
+                        const response = await bitbucketToGithub.post('/authorize-github/', {code: this.code}, {headers: {'Authorization': `Bearer ${this.loginInfo.token}`}});
+                        this.loginInfo.githubAuthenticated = true;
+                    } catch (e) {
+                        this.loginInfo.githubAuthenticated = false;
+                    } finally {
+                        this.githubLoading = false;
+                    }
+                }
             },
             getUserRepos: async function() {
                 this.loading = true;
@@ -83,13 +113,20 @@ function init(token) {
                 localStorage.removeItem('bitbucketToken');
                 this.token = undefined;
                 this.userInfo= {};
+                this.code = undefined;
+                this.loginInfo= {};
+                this.loading= false;
+                this.repos = {};
+                this.githubLoading= false;
             }
         }
     });
-    app.getUserInfo();
+    await app.getUserInfo();
+    await app.retrieveGithubAuthToken();
 }
 
 window.addEventListener("load", function(){
-    const token = retrieveToken();
-    init(token);
+    const token = retrieveBitbucketToken();
+    const code = retrieveGithubCode();
+    init(token, code);
 });
