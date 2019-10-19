@@ -1,0 +1,28 @@
+body, * {
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: normal !important;
+}
+
+.align-center {
+    align-items: center;
+}
+
+#login-logo {
+    width: 15vw;
+}
+
+.no-cursor {
+    cursor: auto;
+}
+
+.repo {
+    margin: 2vh 0;
+}
+
+.progress div {
+    width: 50%;
+}
+
+.progress {
+    height: .2rem;
+}
