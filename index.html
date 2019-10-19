@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="fonts/nunito.css" rel="stylesheet">
+    <script src="scripts/lodash.js"></script>
+    <!-- MUI -->
+    <link href="styles/materialize.min.css" rel="stylesheet" type="text/css" />
+    <!-- Bulma -->
+    <link href="styles/bulma.min.css" rel="stylesheet" type="text/css" />
+    <!--toast-->
+    <link rel="stylesheet" type="text/css" href="styles/mdtoast.min.css">
+    <script type="text/javascript" src="/scripts/mdtoast.min.js"></script>
+
+    <script src="scripts/vue.js"></script>
+    <script src="scripts/axios.min.js"></script>
+
+    <link rel="stylesheet" href="styles/index.css">
+    <script src="scripts/index.js"></script>
+
+    <title>Bitbucket to Github</title>
+</head>
+<body>
+<section id="app" class="hero">
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+            <a class="navbar-item" href="/">
+                <img src="images/bitbucket.png" width="112" height="28">
+            </a>
+            <span class="has-text-black">to</span>
+            <a class="navbar-item" href="/">
+                <img src="images/github.png" width="85" height="28">
+            </a>
+
+            <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
+        </div>
+
+        <div v-if="userInfo.display_name" id="navbarBasicExample" class="navbar-menu">
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <div class="buttons">
+                    <span class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
+                        <strong>{{userInfo.display_name}}</strong>
+                    </span>
+                        <a @click="logout()" class="button is-light waves-effect waves-light btn">
+                            Log out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="hero-body">
+
+        <div v-if="!loggedIn" class="container">
+            Login with
+            <figure class="image">
+                <a target="_self" href="https://bitbucket.org/site/oauth2/authorize?client_id=YtBjgbYwHyRqN7ZPjw&response_type=token"><img id="login-logo" alt="Bitbucket" src="images/bitbucket.png"></a>
+            </figure>
+        </div>
+        <div v-if="loggedIn" class="container">
+            <div class="columns">
+                <div class="column is-half is-offset-one-quarter has-text-centered">
+                    <div :class="{'has-text-centered': true, 'is-invisible': !loading}">
+                        <div class="progress">
+                            <div class="indeterminate"></div>
+                        </div>
+                        Loading...
+                    </div>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column is-half is-offset-one-quarter has-text-centered">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="repo in repos.values">
+                            <th><a target="_blank" :href="`https://bitbucket.org/${repo.full_name}`">{{repo.full_name}}</a></th>
+                            <th><button class="waves-effect waves-light btn-small" @click="getUserRepos()">Copy to Github</button></th>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <button class="waves-effect waves-light btn-large" :disabled="loading || !_.isEmpty(repos)" @click="getUserRepos()">Get Repos</button>
+                </div>
+<!--                <div class="column is-half">-->
+<!--                    Second column-->
+<!--                </div>-->
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
