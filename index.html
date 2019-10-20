@@ -43,7 +43,7 @@
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
-                        <a v-if="!loginInfo.githubAuthenticated" :disabled="loading || githubLoading" target="_self" :href="`https://github.com/login/oauth/authorize?client_id=Iv1.7e7b7b4572147e74`" class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
+                        <a v-if="!loginInfo.githubAuthenticated" :disabled="loading || githubLoading" target="_self" :href="`https://github.com/login/oauth/authorize?client_id=${githubClientId}`" class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
                             <strong>Authorize Github</strong>
                         </a>
                         <span class="button is-primary navbar-item no-cursor">
@@ -62,7 +62,7 @@
         <div v-if="!loggedIn" class="container">
             Login with
             <figure class="image">
-                <a target="_self" href="https://bitbucket.org/site/oauth2/authorize?client_id=YtBjgbYwHyRqN7ZPjw&response_type=token"><img id="login-logo" alt="Bitbucket" src="images/bitbucket.png"></a>
+                <a target="_self" :href="`https://bitbucket.org/site/oauth2/authorize?client_id=${bitbucketClientId}&response_type=token`"><img id="login-logo" alt="Bitbucket" src="images/bitbucket.png"></a>
             </figure>
         </div>
         <div v-if="loggedIn" class="container">

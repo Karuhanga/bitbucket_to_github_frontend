@@ -1,4 +1,4 @@
-const DEBUG = true;
+const DEBUG = window.location.hostname.indexOf('localhost') > -1;
 let app;
 let progress;
 
@@ -59,6 +59,8 @@ async function init(token, code) {
             repos: {},
             githubLoading: false,
             transfersInProgress: [],
+            bitbucketClientId: DEBUG ? 'YtBjgbYwHyRqN7ZPjw' : 'WuuJR7NpJybXLPpyvt',
+            githubClientId: DEBUG ? 'Iv1.7e7b7b4572147e74': 'Iv1.6610d944be6fe1d1',
         },
         computed: {
             loggedIn: function () {
@@ -129,7 +131,7 @@ async function init(token, code) {
                     const result = await bitbucketToGithub.post(`/copy/${repoSlug}/`, undefined, {headers: {'Authorization': `Bearer ${this.loginInfo.token}`}});
                 } catch (e) {
                     // todo improve this
-                    console.log(e);
+                    log(e);
                 } finally {
                     this.loading = false;
                 }
@@ -155,7 +157,7 @@ async function init(token, code) {
                     this.transfersInProgress = result.data.items;
                 } catch (e) {
                     // todo improve this
-                    console.log(e);
+                    log(e);
                 } finally {
                     this.loading = false;
                 }
@@ -178,7 +180,7 @@ async function init(token, code) {
                     clearInterval(progress);
                 } catch (e) {
                     // logout failed
-                    console.log(e);
+                    log(e);
                 } finally {
                     this.loading = false;
                 }
