@@ -3,7 +3,7 @@ let app;
 let progress;
 
 const bitbucketToGithub = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api',
+    baseURL: DEBUG ? 'http://127.0.0.1:8000/api' : 'https://bitbucket-to-github.herokuapp.com/api',
 });
 
 const bitbucket = axios.create({
