@@ -22,7 +22,7 @@
 </head>
 <body>
 <section id="app" class="hero">
-    <nav class="navbar" role="navigation" aria-label="main navigation">
+    <nav v-cloak class="navbar" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
             <a class="navbar-item" href="/">
                 <img src="images/bitbucket.png" width="112" height="28">
@@ -57,7 +57,7 @@
             </div>
         </div>
     </nav>
-    <div class="hero-body">
+    <div v-cloak class="hero-body">
 
         <div v-if="!loggedIn" class="container">
             Login with

@@ -26,3 +26,7 @@ body, * {
 .progress {
     height: .2rem;
 }
+
+[v-cloak] {
+    display: none;
+}
