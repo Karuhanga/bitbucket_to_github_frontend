@@ -16,6 +16,16 @@ function log(message) {
     }
 }
 
+function removeParam(paramName) {
+    let searchParams = new URLSearchParams(window.location.search);
+    searchParams.delete(paramName);
+    if (history.replaceState) {
+        let searchString = searchParams.toString().length > 0 ? '?' + searchParams.toString() : '';
+        let newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname +  searchString + window.location.hash;
+        history.replaceState(null, 'Bitbucket to Github', newUrl);
+    }
+}
+
 function clearHash() {
     if(window.history.pushState) {
         window.history.pushState('', 'Bitbucket to Github', window.location.pathname)
@@ -41,7 +51,7 @@ function retrieveGithubCode() {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
     if (code) {
-        urlParams.delete('code');
+        removeParam('code');
         return code;
     }
 }
