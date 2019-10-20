@@ -134,6 +134,7 @@ async function init(token, code) {
                     log(e);
                 } finally {
                     this.loading = false;
+                    app.inProgress();
                 }
             },
             showStatus: function(progress) {
@@ -158,8 +159,6 @@ async function init(token, code) {
                 } catch (e) {
                     // todo improve this
                     log(e);
-                } finally {
-                    this.loading = false;
                 }
             },
             logout: async function () {
