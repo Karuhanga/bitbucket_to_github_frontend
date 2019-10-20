@@ -95,6 +95,12 @@
                         </tr>
                         </tbody>
                     </table>
+                    <div v-if="repos.values">
+                        <button class="waves-effect waves-light btn-small" @click="getUserRepos(repos.previous)" :disabled="!repos.previous">Previous page</button>
+                        Page {{repos.page}}
+                        <button class="waves-effect waves-light btn-small" @click="getUserRepos(repos.next)" :disabled="!repos.next">Next page</button>
+                    </div>
+                    <br>
                     <button class="waves-effect waves-light btn-large" :disabled="loading || !_.isEmpty(repos)" @click="getUserRepos()">Get Repos</button>
                 </div>
                 <div class="column is-6 has-text-centered">
@@ -114,7 +120,7 @@
                             <td><a target="_blank" :href="`https://bitbucket.org/${progress.repo_slug}`">{{progress.repo_slug}}</a></td>
                             <td>{{progress.message}}</td>
                             <th>
-                                <button class="waves-effect waves-light btn-small" disabled>{{progress.running ? 'Running' : 'Queued'}}</button>
+                                <button class="waves-effect waves-light btn-small" @click="copy(progress.repo_slug, progress.repo_slug)" :disabled="showStatus(progress) !== 'Retry'">{{showStatus(progress)}}</button>
                             </th>
                         </tr>
                         </tbody>

@@ -102,11 +102,16 @@ async function init(token, code) {
                     }
                 }
             },
-            getUserRepos: async function() {
+            getUserRepos: async function(pageUrl) {
                 this.loading = true;
                 this.loadingMessage = 'Fetching your Bitbucket Repos';
                 try {
-                    const response = await bitbucket.get(`/repositories/${this.userInfo.username}?access_token=${this.token}&role=owner`);
+                    let response;
+                    if (pageUrl) {
+                        response = await axios.get(`${pageUrl}?access_token=${this.token}&role=owner`);
+                    } else {
+                        response = await bitbucket.get(`/repositories/${this.userInfo.username}?access_token=${this.token}&role=owner`);
+                    }
                     this.repos = response.data;
                 } catch (e) {
                     // todo some kind of notification
@@ -128,6 +133,21 @@ async function init(token, code) {
                 } finally {
                     this.loading = false;
                 }
+            },
+            showStatus: function(progress) {
+                if (progress.running) {
+                    return 'Running';
+                }
+
+                if (progress.queued) {
+                    return 'Queued';
+                }
+
+                if (progress.message === 'Done.'){
+                    return 'Complete';
+                }
+
+                return 'Retry';
             },
             inProgress: async function() {
                 try {
