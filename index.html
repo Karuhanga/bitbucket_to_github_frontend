@@ -43,7 +43,7 @@
             <div class="navbar-end">
                 <div class="navbar-item">
                     <div class="buttons">
-                        <a v-if="!loginInfo.githubAuthenticated" :disabled="githubLoading" target="_blank" :href="`https://github.com/login/oauth/authorize?client_id=Iv1.7e7b7b4572147e74`" class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
+                        <a v-if="!loginInfo.githubAuthenticated" :disabled="loading || githubLoading" target="_self" :href="`https://github.com/login/oauth/authorize?client_id=Iv1.7e7b7b4572147e74`" class="button is-primary navbar-item no-cursor waves-effect waves-light btn">
                             <strong>Authorize Github</strong>
                         </a>
                         <span class="button is-primary navbar-item no-cursor">
@@ -77,7 +77,10 @@
                 </div>
             </div>
             <div class="columns">
-                <div class="column is-half is-offset-one-quarter has-text-centered">
+                <div class="column is-6 has-text-centered">
+                    <div class="title">
+                        Your Bitbucket Repos
+                    </div>
                     <table class="table">
                         <thead>
                         <tr>
@@ -87,16 +90,39 @@
                         </thead>
                         <tbody>
                         <tr v-for="repo in repos.values">
-                            <th><a target="_blank" :href="`https://bitbucket.org/${repo.full_name}`">{{repo.full_name}}</a></th>
-                            <th><button class="waves-effect waves-light btn-small" @click="getUserRepos()">Copy to Github</button></th>
+                            <td><a target="_blank" :href="`https://bitbucket.org/${repo.full_name}`">{{repo.name}}</a></td>
+                            <td><button class="waves-effect waves-light btn-small" @click="copy(repo.slug, repo.name)">Copy to Github</button></td>
                         </tr>
                         </tbody>
                     </table>
                     <button class="waves-effect waves-light btn-large" :disabled="loading || !_.isEmpty(repos)" @click="getUserRepos()">Get Repos</button>
                 </div>
-<!--                <div class="column is-half">-->
-<!--                    Second column-->
-<!--                </div>-->
+                <div class="column is-6 has-text-centered">
+                    <div class="title">
+                        In progress
+                    </div>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Repo</th>
+                            <th>Status message</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="progress in transfersInProgress">
+                            <td><a target="_blank" :href="`https://bitbucket.org/${progress.repo_slug}`">{{progress.repo_slug}}</a></td>
+                            <td>{{progress.message}}</td>
+                            <th>
+                                <button class="waves-effect waves-light btn-small" disabled>{{progress.running ? 'Running' : 'Queued'}}</button>
+                            </th>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <div v-if="transfersInProgress.length === 0">
+                        No transfers currently in progress
+                    </div>
+                </div>
             </div>
         </div>
     </div>

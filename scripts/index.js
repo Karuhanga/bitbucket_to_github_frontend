@@ -1,5 +1,6 @@
 const DEBUG = true;
 let app;
+let progress;
 
 const bitbucketToGithub = axios.create({
     baseURL: 'http://127.0.0.1:8000/api',
@@ -57,6 +58,7 @@ async function init(token, code) {
             loadingMessage: 'Loading',
             repos: {},
             githubLoading: false,
+            transfersInProgress: [],
         },
         computed: {
             loggedIn: function () {
@@ -79,6 +81,7 @@ async function init(token, code) {
                         "bitbucket_token": this.token,
                     });
                     this.loginInfo = result.data;
+                    progress = setInterval(app.inProgress, 5000);
                 } catch (e) {
                     this.logout();
                 } finally {
@@ -87,7 +90,7 @@ async function init(token, code) {
 
             },
             retrieveGithubAuthToken: async function() {
-                if (!this.loginInfo.githubAuthenticated) {
+                if (!this.loginInfo.githubAuthenticated && this.code) {
                     this.githubLoading = true;
                     try {
                         const response = await bitbucketToGithub.post('/authorize-github/', {code: this.code}, {headers: {'Authorization': `Bearer ${this.loginInfo.token}`}});
@@ -112,20 +115,60 @@ async function init(token, code) {
                     this.loading = false;
                 }
             },
-            logout: function () {
-                localStorage.removeItem('bitbucketToken');
-                this.token = undefined;
-                this.userInfo= {};
-                this.code = undefined;
-                this.loginInfo= {};
-                this.loading= false;
-                this.repos = {};
-                this.githubLoading= false;
+            copy: async function(repoSlug, repoName) {
+                // todo disable button
+                this.loading = true;
+                this.loadingMessage = `Queueing up ${repoName}`;
+
+                try {
+                    const result = await bitbucketToGithub.post(`/copy/${repoSlug}/`, undefined, {headers: {'Authorization': `Bearer ${this.loginInfo.token}`}});
+                } catch (e) {
+                    // todo improve this
+                    console.log(e);
+                } finally {
+                    this.loading = false;
+                }
+            },
+            inProgress: async function() {
+                try {
+                    const result = await bitbucketToGithub.get(`/in-progress/`, {headers: {'Authorization': `Bearer ${this.loginInfo.token}`}});
+                    this.transfersInProgress = result.data.items;
+                } catch (e) {
+                    // todo improve this
+                    console.log(e);
+                } finally {
+                    this.loading = false;
+                }
+            },
+            logout: async function () {
+                this.loading = true;
+                this.loadingMessage = "Logging you out";
+                try {
+                    if (this.loginInfo.token) {
+                        const result = await bitbucketToGithub.post('/logout/', undefined, {headers: {'Authorization': `Bearer ${this.loginInfo.token}`}});
+                    }
+                    localStorage.removeItem('bitbucketToken');
+                    this.token = undefined;
+                    this.userInfo= {};
+                    this.code = undefined;
+                    this.loginInfo= {};
+                    this.loadingMessage= 'Loading';
+                    this.repos = {};
+                    this.githubLoading= false;
+                    clearInterval(progress);
+                } catch (e) {
+                    // logout failed
+                    console.log(e);
+                } finally {
+                    this.loading = false;
+                }
             }
         }
     });
-    await app.getUserInfo();
-    await app.retrieveGithubAuthToken();
+    if (token) {
+        await app.getUserInfo();
+        await app.retrieveGithubAuthToken();
+    }
 }
 
 window.addEventListener("load", function(){
