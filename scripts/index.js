@@ -54,6 +54,7 @@ async function init(token, code) {
             userInfo: {},
             loginInfo: {},
             loading: false,
+            loadingMessage: 'Loading',
             repos: {},
             githubLoading: false,
         },
@@ -68,6 +69,7 @@ async function init(token, code) {
         methods: {
             getUserInfo: async function () {
                 this.loading = true;
+                this.loadingMessage = 'Logging you in';
                 try {
                     const response = await bitbucket.get(`/user?access_token=${this.token}`);
                     this.userInfo = response.data;
@@ -99,6 +101,7 @@ async function init(token, code) {
             },
             getUserRepos: async function() {
                 this.loading = true;
+                this.loadingMessage = 'Fetching your Bitbucket Repos';
                 try {
                     const response = await bitbucket.get(`/repositories/${this.userInfo.username}?access_token=${this.token}&role=owner`);
                     this.repos = response.data;
